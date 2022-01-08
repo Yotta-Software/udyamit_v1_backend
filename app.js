@@ -7,31 +7,30 @@ const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100mb" }));
-
-// const { initializeApp } = require("firebase-admin/app");
-const firebaseConfig = require("./config.js");
-
-const admin = require("firebase-admin");
-
-global.firebaseApp = admin.initializeApp({
-  credential: admin.credential.cert(firebaseConfig),
-});
-
 require("./db");
-
-const { register } = require("./apis/users/register.js");
-app.get("/reg", (req, res) => {
-  res.send("hii").end();
-});
-app.post("/api/reg", register);
+// // const { initializeApp } = require("firebase-admin/app");
+// const firebaseConfig = require("./config.js");
+// const admin = require("firebase-admin");
+// global.firebaseApp = admin.initializeApp({
+//   credential: admin.credential.cert(firebaseConfig),
+// });
+//const { register } = require("./apis/users/register.js");
+// app.get("/reg", (req, res) => {
+//   res.send("hii").end();
+// });
+//app.post("/api/reg", register);
+// global.rootDir = __dirname;
+const errorHandler=require('./middelware/error');
+app.get('/',(req, res) => {
+  res.send('API is available');
+})
+const auth = require('./routes/auth');
+app.use('/api/v1/auth',auth);
+app.use(errorHandler);
 
 app.listen(4000, () => {
-  console.log("server lesten on 4000");
+  console.log("server listen on 4000");
 });
-
-//
-// global.rootDir = __dirname;
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, __dirname + "/uploads");

@@ -1,34 +1,40 @@
-// const { initializeApp } = require("firebase-admin/app");
-// const { getAuth } = require("firebase-admin/auth");
-// const firebaseConfig = require("../config.js");
-// const app = initializeApp(firebaseConfig);
+const jwt=require('jsonwebtoken'),
+      asyncHandler =require('./async'),
+      ErrorResponse =require('../utils/errorResponse'),
+      User=require('../models/User');
 
-// const fireAuth = async (req, res, next) => {
-//   try {
-//     // console.log("token ", req.cookies["token"]);
-//     if (
-//       req.originalUrl !== "/api/v0.0.1/user/login" &&
-//       req.originalUrl !== "/api/v0.0.1/user/register" &&
-//       req.originalUrl !== "/api/v0.0.1/user/isRegistered"
-//     ) {
-//       getAuth(app)
-//         .verifyIdToken(req.headers.authorization)
-//         .then(async (decodedToken) => {
-//           const uid = decodedToken.uid;
-//           const user = await varifyToken(uid);
-//           req.body.user = user;
-//           // console.log(uid,"uid is --",user)
-//           next();
-//         })
-//         .catch((error) => {
-//           console.log("erroir", error);
-//           return res.status(401).json({ msg: "success" });
-//         });
-//     } else next();
-//   } catch (err) {
-//     console.log("auth error", err);
-//     return res.status(401).json({ msg: "success" });
-//   }
-// };
+// Protect routes
+exports.protect=asyncHandler(async(req,res,next)=>{
+   let token;
+   // check if token && starts with Bearer
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token=req.headers.authorization.split(' ')[1];
+    }else{
+        return next(new ErrorResponse(`Not Authorize to access this route `,401));
+    }
+    // if(req.cookie?.token){
+    //     token=req.cookie.token;
+    // }
 
-// module.exports = { varifyToken, auth, fireAuth };
+    // Make sure token exsist 
+    if(!token){
+        return next(new ErrorResponse(`Not Authorize to access this route `,401));
+    }
+    try {
+        //  verify  token
+        const decoded= jwt.verify(token,process.env.JWT_SECRET);
+        req.user=await User.findById(decoded.id);
+        next();
+    } catch (error) {
+        return next(new ErrorResponse(`Not Authorize to access this route `,401));
+    }
+});
+
+// grant access to spcific roles
+exports.authrize=(...roles)=>(req,res,next)=>{
+    if(!roles.includes(req.user.role)){
+        return next(new ErrorResponse(`User role ${req.user.role} is not Authorize to access this route .`,403));
+    }
+    next();
+}
+module.exports=exports;
