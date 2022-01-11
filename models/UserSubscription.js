@@ -1,27 +1,20 @@
 const mongoose = require("mongoose");
 
 const userSubscriptionSchema = mongoose.Schema({
-  uid: {
-    type: String,
-    required: true,
-  },
   email: {
     type: String,
     required: true,
   },
-  type: {
-    type: String,
-    required: true,
+  courseId: {
+    type:mongoose.Schema.ObjectId,
+    ref:'Digital',
+    required:true
   },
-  subscriptions: {
-    id: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    amount: Number,
-    paymentID: String,
-    orderId: String,
-  },
+  cousePrice:Number,
+  user:{
+    type:mongoose.Schema.ObjectId,
+    ref:'User',
+    required:true
+},
 });
 module.exports = mongoose.model("UserSubscription", userSubscriptionSchema);

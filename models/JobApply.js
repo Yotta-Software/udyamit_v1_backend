@@ -21,10 +21,8 @@ const jobApplySchema = mongoose.Schema({
   lname: String,
   motherName: String,
   phone: String,
-  dob: String, //
+  dob: String, 
   religion: String,
-
-  //jorrole   category   ouside india   exprice
 
   address: String,
   district: String,
@@ -61,6 +59,11 @@ const jobApplySchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  user:{
+    type:mongoose.Schema.ObjectId,
+    ref:'User',
+    required:true
+}
 });
 
 module.exports = mongoose.model("JobApply", jobApplySchema);

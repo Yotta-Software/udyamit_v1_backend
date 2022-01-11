@@ -37,10 +37,11 @@ const personal = async (req, res) => {
       dob,
       religion,
     });
-
+console.log('------step1--- ',newJobApply);
     await newJobApply.save();
     return res.status(200).json({
       msg: "step 1 completed",
+
     });
   } catch (error) {
     console.log(error);
@@ -79,8 +80,10 @@ const address = async (req, res) => {
     job.street = street;
     job.step = 2;
     await job.save();
+    console.log('------step2--- ',job);
     return res.status(200).json({
       msg: "step 2 completed",
+      job
     });
   } catch (error) {
     console.log(error);
@@ -92,7 +95,6 @@ const address = async (req, res) => {
 
 const qulification = async (req, res) => {
   try {
-    console.log("data q", req.body);
     const {
       jobId,
       jobApplyId,
@@ -116,8 +118,9 @@ const qulification = async (req, res) => {
     job.pdiscipline = pdiscipline;
     job.step = 3;
     await job.save();
+    console.log('------step3--- ',job);
     return res.status(200).json({
-      msg: "step 2 completed",
+      msg: "step 3 completed",
     });
   } catch (error) {
     console.log(error);
@@ -151,7 +154,6 @@ const perfrance = async (req, res) => {
     job.prefrenceA = prefrenceA;
     job.prefrenceB = prefrenceB;
     job.prefrenceC = prefrenceC;
-
     job.role = role;
     job.category = category;
     job.experience = experience;
@@ -159,8 +161,9 @@ const perfrance = async (req, res) => {
     job.isJobOutsideIndia = isJobOutsideIndia;
     job.step = 4;
     await job.save();
+    console.log('------step4--- ',job);
     return res.status(200).json({
-      msg: "step 2 completed",
+      msg: "step 4 completed",
     });
   } catch (error) {
     console.log(error);
@@ -189,9 +192,9 @@ const document = async (req, res) => {
     job.step = 5;
 
     await job.save();
-
+    console.log('------step5--- ',job);
     return res.status(200).json({
-      msg: "step 2 completed",
+      msg: "step 5 completed",
       body: {
         email: job.email,
         name: job.fname + " " + job.lname,
