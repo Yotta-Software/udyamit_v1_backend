@@ -161,9 +161,41 @@ app.post('/uploads',(req,res)=>{
     })
   })
   app.get('/applied',async function(req,res){
-      const applications= await JobApply.find();
+      const applications= await JobApply.remove();
       res.json({applications});
   })
+  const Subscription=require('./models/Subscription');
+  app.post('/subscription',async function(req,res){
+      try{
+        const isSubscribed= await Subscription.findOne({
+          courseId: req.body.courseId,
+          user:req.body.user
+        })
+        if(isSubscribed){
+          return res.status(408).json({
+            success: false,message:' you are already enrolled in this course'
+          })
+        }
+        const subscription= await Subscription.create(req.body);
+        res.status(200).json({
+            success: true,
+            subscription: subscription
+        })
+      }catch(err){
+         res.status(500).json({success: false, message:err})
+      }
+  })
+  app.get('/subscription',async function(req,res){
+    try{
+      const subscription= await Subscription.remove();
+      res.status(200).json({
+          success: true,
+          subscription: subscription
+      })
+    }catch(err){
+       res.status(500).json({success: false, message:err})
+    }
+})
 app.use(express.static(path.join(__dirname, "/client/build")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/client/build", "index.html"));
