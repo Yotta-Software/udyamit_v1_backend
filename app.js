@@ -1,10 +1,20 @@
 require("dotenv").config();
 const express = require("express");
+const https = require("https");
+const fs = require("fs");
 const multer = require("multer"),
 fileupload=require('express-fileupload');
 const cors = require("cors");
 const path = require("path");
 const app = express();
+
+const options = {
+  key : fs.readFileSync('./greenlock.d/live/udyamit.in/privkey.pem'),
+  cert : fs.readFileSync('./greenlock.d/live/udyamit.in/cert.pem')
+}
+
+https.createServer(options, app).listen(8080, () => console.log('listening on port 8080'));
+
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100mb" }));
@@ -22,9 +32,6 @@ const auth = require('./routes/auth');
 app.use('/api/v1/auth',auth);
 app.use(errorHandler);
 
-app.listen(8080, () => {
-  console.log("server listen on 8080");
-});
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, __dirname + "/uploads");

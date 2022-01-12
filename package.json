@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "pro": "node server.js"
   },
   "author": "sanjiv",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "express-fileupload": "^1.2.1",
     "firebase-admin": "^10.0.0",
     "greenlock-express": "^4.0.3",
+    "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "mkdirp": "^1.0.4",
     "mongoose": "^6.0.13",
