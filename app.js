@@ -13,18 +13,7 @@ app.use(express.urlencoded({ extended: true, limit: "100mb" }));
  // file uploading
  app.use(fileupload());
 require("./db");
-// // const { initializeApp } = require("firebase-admin/app");
-// const firebaseConfig = require("./config.js");
-// const admin = require("firebase-admin");
-// global.firebaseApp = admin.initializeApp({
-//   credential: admin.credential.cert(firebaseConfig),
-// });
-//const { register } = require("./apis/users/register.js");
-// app.get("/reg", (req, res) => {
-//   res.send("hii").end();
-// });
-//app.post("/api/reg", register);
-// global.rootDir = __dirname;
+
 const errorHandler=require('./middelware/error');
 app.get('/',(req, res) => {
   res.send('API is available');
@@ -64,7 +53,7 @@ const razorpay = new Razorpay({
 const JOB = require("./models/Job");
 const DigitalLearning = require("./models/DigitalLearning.js");
 const JobApply = require("./models/JobApply.js");
-
+const Contactus = require("./models/Contactus.js");
 app.post("/pay", async (req, res) => {
   try {
     // const application = null;
@@ -195,6 +184,18 @@ app.post('/uploads',(req,res)=>{
     }catch(err){
        res.status(500).json({success: false, message:err})
     }
+})
+app.post('/contactus',async(req, res)=>{
+  try{
+    const message = await Contactus.create(req.body);
+    res.status(200).json({success:true, message:message});
+  }catch(err){
+      res.status(500).json({message: err.message});
+  }
+
+})
+app.get('/download',(req,res)=>{
+  res.download('./Udyamit.pdf');
 })
 app.use(express.static(path.join(__dirname, "/client/build")));
 app.get("*", (req, res) => {
