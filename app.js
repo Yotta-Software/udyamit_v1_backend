@@ -22,8 +22,8 @@ const auth = require('./routes/auth');
 app.use('/api/v1/auth',auth);
 app.use(errorHandler);
 
-app.listen(4000, () => {
-  console.log("server listen on 4000");
+app.listen(8080, () => {
+  console.log("server listen on 8080");
 });
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
