@@ -1,7 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const https = require("https");
-const fs = require("fs");
 fileupload=require('express-fileupload');
 const cors = require("cors");
 const path = require("path");
@@ -24,19 +22,31 @@ app.use('/api/v1/auth',auth);
 app.use(errorHandler);
 app.use("/api", require("./routes/dataRoutes"));
 
-const JOB = require("./models/Job");
-const DigitalLearning = require("./models/DigitalLearning.js");
 const JobApply = require("./models/JobApply.js");
 const Contactus = require("./models/Contactus.js");
-
+const User = require("./models/User.js");
+// get all users 
+// GET all users
+app.get('/users',async(req,res)=>{
+    const users=await User.find({});
+    res.status(200).json({success:true,users});
+})
 app.post('/applyjob',async (req, res)=>{
     try{
+        const {jobId,user}=req.body;
+        const isApplied = await JobApply.findOne({jobId,user,isPaid:true});
+        if(isApplied){
+          return  res.status(408).json({success:false,message:"You already had applied for this job !"});
+        }
+        // removing all unPaid jobs
+        await JobApply.deleteMany({isPaid:false});
         const application= await JobApply.create(req.body);
-        res.status(201).json({success:true,application:application})
+        console.log('-------- new application ---------------',application);
+        res.status(201).json({success:true,application});
     } catch (error) {
-        res.status(408).json({success:true,message:"You already had applied for this job !"})
+        res.status(500).json({success:false,message:error})
     }
-})
+});
 //================================================================================================================================
 app.post('/uploads',(req,res)=>{
     function makeid(length) {
@@ -70,34 +80,42 @@ app.post('/uploads',(req,res)=>{
             }});
     })
   })
-  app.get('/applied',async function(req,res){
-      const applications= await JobApply.remove();
-      res.json({applications});
+  // get all applications
+  // GET /applications
+  app.get('/applications',async function(req,res){
+      const applications= await JobApply.find().sort({$natural:-1})
+      res.status(200).json({sucess:true,applications});
   })
   const Subscription=require('./models/Subscription');
   app.post('/subscription',async function(req,res){
       try{
         const isSubscribed= await Subscription.findOne({
           courseId: req.body.courseId,
-          user:req.body.user
+          user:req.body.user,
+          isPaid:true
         })
         if(isSubscribed){
           return res.status(408).json({
             success: false,message:' you are already enrolled in this course'
           })
         }
-        const subscription= await Subscription.create(req.body);
+        // removing unPaid subscriptions
+        await Subscription.deleteMany({isPaid:false});
+        const subscription= await Subscription.create({...req.body,isPaid:false});
+       // console.log('-------- new subscription ---------------',subscription);
         res.status(200).json({
             success: true,
-            subscription: subscription
+            subscription
         })
       }catch(err){
          res.status(500).json({success: false, message:err})
       }
   })
-  app.get('/subscription',async function(req,res){
+  // get all subscriptions
+  // GET /subscriptions
+  app.get('/subscriptions',async function(req,res){
     try{
-      const subscription= await Subscription.remove();
+      const subscription= await Subscription.find({}).sort({$natural:-1});
       res.status(200).json({
           success: true,
           subscription: subscription
@@ -113,13 +131,32 @@ app.post('/contactus',async(req, res)=>{
   }catch(err){
       res.status(500).json({message: err.message});
   }
-
+})
+// get all message 
+// GET /contactus
+app.get('/contactus',async (req, res)=>{
+  const messages = await Contactus.find();
+  res.status(200).json({success:true, messages});
 })
 app.get('/download',(req,res)=>{
   res.download('./Udyamit.pdf');
 })
-app.post('/pay/success',(req,res)=>{
-  res.redirect('http://udyamit.in');
+app.post('/pay/:service/success',async (req,res)=>{
+  if(req.params.service==="course"){
+      let course = await Subscription.findOne({email:req.body.email}).sort({$natural:-1});
+      course = await Subscription.findByIdAndUpdate(course._id,{isPaid:true},{new:true});
+      await Subscription.deleteMany({isPaid:false});
+      res.status(200).json(course);
+      
+  }
+  if(req.params.service==="applyjob"){
+      //.sort({$natural:-1});{"email": "abhiwebdev2718@gmail.com"}
+      let application = await JobApply.findOne({email:req.body.email}).sort({$natural:-1});
+      application = await JobApply.findByIdAndUpdate(application._id,{isPaid:true},{new:true});
+      await JobApply.deleteMany({isPaid:false});
+      res.status(200).json(application);
+     //res.redirect('http://udyamit.in');
+ }
 })
 app.post('/pay/fail',(req,res)=>{
   res.send('<p>Payment fail ,Please try again!</p>');
@@ -132,5 +169,5 @@ if(process.env.NODE_ENV === 'production'){
 }
 app.listen(8080,()=>console.log("listening on port 8080"));
 module.exports = app;
-// http://udyamit.in/pay/success
-//http://udyamit.in/pay/fail
+// http://udyamit.in:8080/pay/success
+//http://udyamit.in:8080/pay/fail

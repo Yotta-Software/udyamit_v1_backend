@@ -1,16 +1,11 @@
 const mongoose = require("mongoose");
 
 const jobApplySchema = mongoose.Schema({
-  jobApplyId: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   jobId: {
-    type: String,
-    required: true,
+    type:mongoose.Schema.ObjectId,
+    ref:'JOB',
+    required:true
   },
-
   email: {
     type: String,
     required: true,
@@ -23,20 +18,17 @@ const jobApplySchema = mongoose.Schema({
   phone: String,
   dob: String, 
   religion: String,
-
   address: String,
   district: String,
   hn: String,
   pin: String,
   state: String,
   street: String,
-
   qulification: String,
   degree: String,
   discipline: String,
   pdegree: String,
   pdiscipline: String,
-
   prefrenceA: String,
   prefrenceB: String,
   prefrenceC: String,
@@ -48,7 +40,6 @@ const jobApplySchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
   signature: String,
   photo: String,
   idBack: String,
@@ -63,7 +54,7 @@ const jobApplySchema = mongoose.Schema({
     type:mongoose.Schema.ObjectId,
     ref:'User',
     required:true
-}
+ }
 });
 
 module.exports = mongoose.model("JobApply", jobApplySchema);
