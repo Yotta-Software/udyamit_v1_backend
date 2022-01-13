@@ -118,9 +118,19 @@ app.post('/contactus',async(req, res)=>{
 app.get('/download',(req,res)=>{
   res.download('./Udyamit.pdf');
 })
-app.use(express.static(path.join(__dirname, "/client/build")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/client/build", "index.html"));
-});
+app.post('/pay/success',(req,res)=>{
+  res.redirect('http://udyamit.in');
+})
+app.post('/pay/fail',(req,res)=>{
+  res.send('<p>Payment fail ,Please try again!</p>');
+})
+if(process.env.NODE_ENV === 'production'){
+  app.use(express.static(path.join(__dirname, "/client/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "/client/build", "index.html"));
+  });
+}
 app.listen(8080,()=>console.log("listening on port 8080"));
 module.exports = app;
+// http://udyamit.in/pay/success
+//http://udyamit.in/pay/fail
