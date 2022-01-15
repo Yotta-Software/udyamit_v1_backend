@@ -14,9 +14,9 @@ app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 require("./db");
 
 const errorHandler=require('./middelware/error');
-app.get('/',(req, res) => {
-  res.send('API is available');
-})
+// app.get('/',(req, res) => {
+//   res.send('API is available');
+// })
 const auth = require('./routes/auth');
 app.use('/api/v1/auth',auth);
 app.use(errorHandler);
@@ -146,7 +146,8 @@ app.post('/pay/:service/success',async (req,res)=>{
       let course = await Subscription.findOne({email:req.body.email}).sort({$natural:-1});
       course = await Subscription.findByIdAndUpdate(course._id,{isPaid:true},{new:true});
       await Subscription.deleteMany({isPaid:false});
-      res.status(200).json(course);
+     // res.status(200).json(course);
+      res.redirect('http://udyamit.in/digitalLearning');
       
   }
   if(req.params.service==="applyjob"){
@@ -154,20 +155,17 @@ app.post('/pay/:service/success',async (req,res)=>{
       let application = await JobApply.findOne({email:req.body.email}).sort({$natural:-1});
       application = await JobApply.findByIdAndUpdate(application._id,{isPaid:true},{new:true});
       await JobApply.deleteMany({isPaid:false});
-      res.status(200).json(application);
-     //res.redirect('http://udyamit.in');
+      //res.status(200).json(application);
+      res.redirect('http://udyamit.in/creers');
  }
 })
 app.post('/pay/fail',(req,res)=>{
   res.send('<p>Payment fail ,Please try again!</p>');
 })
-if(process.env.NODE_ENV === 'production'){
-  app.use(express.static(path.join(__dirname, "/client/build")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "/client/build", "index.html"));
-  });
-}
+app.use(express.static(path.resolve(__dirname, '../frontend/build')))
+app.get('/', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
+});
+
 app.listen(8080,()=>console.log("listening on port 8080"));
 module.exports = app;
-// http://udyamit.in:8080/pay/success
-//http://udyamit.in:8080/pay/fail
