@@ -147,7 +147,7 @@ app.post('/pay/:service/success',async (req,res)=>{
       course = await Subscription.findByIdAndUpdate(course._id,{isPaid:true},{new:true});
       await Subscription.deleteMany({isPaid:false});
      // res.status(200).json(course);
-      res.redirect('http://udyamit.in/digitalLearning');
+      res.redirect('https://udyamit.in/digitalLearning');
       
   }
   if(req.params.service==="applyjob"){
@@ -156,15 +156,15 @@ app.post('/pay/:service/success',async (req,res)=>{
       application = await JobApply.findByIdAndUpdate(application._id,{isPaid:true},{new:true});
       await JobApply.deleteMany({isPaid:false});
       //res.status(200).json(application);
-      res.redirect('http://udyamit.in/creers');
+      res.redirect('https://udyamit.in/creers');
  }
 })
 app.post('/pay/fail',(req,res)=>{
   res.send('<p>Payment fail ,Please try again!</p>');
 })
-app.use(express.static(path.resolve(__dirname, '../frontend/build')))
+app.use(express.static(path.resolve(__dirname, '../client/build')))
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(8080,()=>console.log("listening on port 8080"));
