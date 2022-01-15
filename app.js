@@ -3,6 +3,7 @@ const express = require("express");
 fileupload=require('express-fileupload');
 const cors = require("cors");
 const path = require("path");
+const morgan = require('morgan');
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "100mb" }));
@@ -12,15 +13,18 @@ app.use(express.urlencoded({ extended: true, limit: "100mb" }));
  // file uploading
  app.use(fileupload());
 require("./db");
-
+app.use(morgan('tiny'));
 const errorHandler=require('./middelware/error');
+
+
 // app.get('/',(req, res) => {
 //   res.send('API is available');
 // })
 const auth = require('./routes/auth');
+app.use("/api", require("./routes/dataRoutes"));
 app.use('/api/v1/auth',auth);
 app.use(errorHandler);
-app.use("/api", require("./routes/dataRoutes"));
+
 
 const JobApply = require("./models/JobApply.js");
 const Contactus = require("./models/Contactus.js");
@@ -162,10 +166,10 @@ app.post('/pay/:service/success',async (req,res)=>{
 app.post('/pay/fail',(req,res)=>{
   res.send('<p>Payment fail ,Please try again!</p>');
 })
-app.use(express.static(path.resolve(__dirname, '../client/build')))
-app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
-});
 
+app.use(express.static(path.resolve(__dirname, './build')))
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, './build', 'index.html'));
+});
 app.listen(8080,()=>console.log("listening on port 8080"));
 module.exports = app;
